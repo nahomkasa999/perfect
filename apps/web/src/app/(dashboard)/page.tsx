@@ -1,0 +1,55 @@
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"; 
+
+export default function Home() {
+  return (
+    <div className="flex w-screen items-center justify-center p-4 font-sans">
+      <Card className="w-full max-w-2xl rounded-xl shadow-lg md:w-[70%] lg:w-[60%] text-gray-50 overflow-y-auto">
+        <CardHeader className="space-y-2 p-6">
+          <CardTitle className="text-3xl font-bold text-gray-50">
+            Welcome to Your Next.js Fullstack Starter!
+          </CardTitle>
+          <CardDescription className="text-md text-gray-400">
+            Jumpstart your development with a robust, scalable, and modern fullstack template. This project is engineered for rapid prototyping and production-ready deployments, featuring cutting-edge technologies and best practices.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6 p-6 pt-0">
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold text-gray-200">Key Features:</h3>
+            <ul className="list-inside list-disc space-y-1 text-gray-300">
+              <li>Monorepo Structure</li>
+              <li>Type-Safe Development</li>
+              <li>Modern UI/UX</li>
+              <li>Optimized Data Fetching</li>
+              <li>Robust Backend</li>
+              <li>Secure Authentication</li>
+              <li>Powerful ORM</li>
+              <li>Rich Text Editing</li>
+              <li>API Documentation</li>
+              <li>Fast Builds</li>
+              <li>Scalable Architecture</li>
+            </ul>
+          </div>
+        </CardContent>
+        <CardFooter className="p-6 pt-0">
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold text-gray-200">Tools & Technologies Used:</h3>
+            <ul className="list-inside list-disc space-y-1 text-gray-300">
+              <li>Frontend: Next.js, React, TypeScript, Shadcn UI, Tailwind CSS, React Query</li>
+              <li>Backend: Hono.js, BetterAuth, Prisma ORM, PostgreSQL</li>
+              <li>Monorepo: Turborepo, pnpm</li>
+              <li>Documentation: Swagger</li>
+              <li>Build/Bundling: Turbopack</li>
+            </ul>
+          </div>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+}
