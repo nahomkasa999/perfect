@@ -37,7 +37,7 @@ io.on("connection", (clientSocket) => {
     try {
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash",
-        contents:`you are a grammer teacher and world class writer. your style of writing is similar to Robert Greene the author of power and human nature. correct this sentence, enhance and amplife the grammer and emotion we you do so dont add a lot to the users sentence if the user write one sentence reponed with one sentence with out living users originality` + data.text,
+        contents:`just correct the grammer, guest send the plain text text: string` + data.prompt,
         config: {
            responseMimeType: "application/json",
           thinkingConfig: {
