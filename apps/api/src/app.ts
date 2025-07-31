@@ -3,8 +3,6 @@ import { swaggerUI } from "@hono/swagger-ui";
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import type { Context } from "hono";
 
-
-
 const app = new OpenAPIHono();
 
 app.use(
@@ -18,6 +16,7 @@ app.use(
     credentials: true,
   })
 );
+
 app.onError((err, c) => {
   console.error("Unhandled error:", err);
   return c.json(
@@ -28,7 +27,6 @@ app.onError((err, c) => {
     500
   );
 });
-
 
 const getUsersRoute = createRoute({
   method: "get",
@@ -44,9 +42,10 @@ const getUsersRoute = createRoute({
   },
 });
 const getUsersHandler = async (c: Context) => {
-  return c.json({"Hellow" : "we have made it this far"});
+  return c.json({ Hellow: "we have made it this far" });
 };
-app.openapi(getUsersRoute, getUsersHandler)
+
+app.openapi(getUsersRoute, getUsersHandler);
 
 app.get("/ui", swaggerUI({ url: "/doc" }));
 app.doc("/doc", {
