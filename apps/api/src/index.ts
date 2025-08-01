@@ -1,12 +1,7 @@
 import { serve } from "@hono/node-server";
 import { Server } from "socket.io";
+
 import app from "./app.js";
-import { GoogleGenAI } from "@google/genai";
-
-const GOOGLE_API_KEY = "AIzaSyA5y-1WlLrbIVnsda2gkltOkpR8mNO9Gvo";
-const GEMINI_MODEL = "gemini-2.5-flash";
-
-const ai = new GoogleGenAI({ apiKey: GOOGLE_API_KEY });
 
 const httpServer = serve(
   {
@@ -21,9 +16,48 @@ const httpServer = serve(
 const io = new Server(httpServer, {
   cors: {
     origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
-  },
+    methods: ["GET", "POST"]
+  }
 });
+
+const callGeminiApi = async (prompt: object, retryCount = 0) => {
+    const apiKey = "";
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+    const payload = {
+        contents: [{
+            role: "user",
+            parts: [{ text: prompt }]
+        }]
+    };
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.status === 429 && retryCount < 5) {
+            const delay = Math.pow(2, retryCount) * 1000;
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return callGeminiApi(prompt, retryCount + 1);
+        }
+
+        const result = await response.json();
+        if (result.candidates && result.candidates.length > 0 &&
+            result.candidates[0].content && result.candidates[0].content.parts &&
+            result.candidates[0].content.parts.length > 0) {
+            return result.candidates[0].content.parts[0].text;
+        } else {
+            console.error("Gemini API response was malformed:", result);
+            return null;
+        }
+
+    } catch (error) {
+        console.error("Error calling Gemini API:", error);
+        return null;
+    }
+};
 
 io.on("connection", (clientSocket) => {
   console.log(`Frontend client connected: ${clientSocket.id}`);
@@ -34,36 +68,13 @@ io.on("connection", (clientSocket) => {
       data
     );
 
-    try {
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents:`just correct the grammer, guest send the plain text text: string` + data.prompt,
-        config: {
-           responseMimeType: "application/json",
-          thinkingConfig: {
-            thinkingBudget: 0,
-          },
-        },
-      });
+    const aiResponse = await callGeminiApi(data.prompt);
 
-      const geminiResponse = response.candidates![0].content?.parts
-
-      console.log(
-        `Received response from Gemini API for client ${clientSocket.id}:`,
-        geminiResponse
-      );
-
+    if (aiResponse) {
+      clientSocket.emit("googleApiResponse", { text: aiResponse });
+    } else {
       clientSocket.emit("googleApiResponse", {
-        text: geminiResponse,
-      });
-    } catch (error: any) {
-      console.error(
-        `Error calling Gemini API for client ${clientSocket.id}:`,
-        error
-      );
-      clientSocket.emit("googleApiError", {
-        message: `Failed to communicate with Gemini API: ${error.message || "Unknown error"}`,
-        details: error,
+        text: "Sorry, I could not generate a response.",
       });
     }
   });

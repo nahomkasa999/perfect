@@ -204,7 +204,7 @@ export function SimpleEditor() {
     const paragraphBreak = /\n\n/;
 
     let shouldSend = false;
-    let textToSend = newContent.trim(); // Trim for sending to AI
+    let textToSend = newContent.trim();
 
     if (sentenceEndings.test(newContent)) {
       shouldSend = true;
@@ -217,12 +217,12 @@ export function SimpleEditor() {
     if (shouldSend && textToSend.length > 0) {
       console.log("Sending to AI:", textToSend);
       socket.emit("sendToGoogleApi", { prompt: textToSend });
-      sentenceToReplaceRef.current = textToSend; // Store the exact sentence sent
+      sentenceToReplaceRef.current = textToSend;
       lastSentContentRef.current = currentText;
     } else if (newContent.length > 0 && debounceTimeoutRef.current === null) {
       console.log("Sending accumulated text to AI (debounce):", newContent.trim());
       socket.emit("sendToGoogleApi", { prompt: newContent.trim() });
-      sentenceToReplaceRef.current = newContent.trim(); // Store the exact text sent
+      sentenceToReplaceRef.current = newContent.trim();
       lastSentContentRef.current = currentText;
     }
   }, []);
@@ -279,7 +279,8 @@ export function SimpleEditor() {
   React.useEffect(() => {
     const handleApiResponse = (arg: { text: Array<{ text: string }> }) => {
         if (editor && sentenceToReplaceRef.current !== null) {
-            const correctedTextParts = arg.text.map(part => part.text).join('');
+            const correctedTextParts = arg.text.map(part => part.text).join('').slice(1,-2) + " ";
+            console.log("correctedTextParts:" + correctedTextParts)
             const originalText = sentenceToReplaceRef.current;
 
             const editorContent = editor.getText();
