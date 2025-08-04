@@ -200,29 +200,30 @@ export function SimpleEditor() {
       return;
     }
 
-    const sentenceEndings = /[.?!]\s*$/;
-    const paragraphBreak = /\n\n/;
+    const words = newContent.trim().split(/\s+/);
+    const minWordCount = 5;
+    const isSentenceEnd = /[.?!]\s*$/.test(newContent);
+    const isParagraphBreak = /\n\n/.test(newContent);
 
     let shouldSend = false;
     let textToSend = newContent.trim();
 
-    if (sentenceEndings.test(newContent)) {
+    if (isSentenceEnd) {
       shouldSend = true;
-    } else if (paragraphBreak.test(newContent)) {
-      const parts = newContent.split(paragraphBreak);
+      textToSend = newContent.trim();
+    } else if (isParagraphBreak) {
+      const parts = newContent.split(isParagraphBreak);
       textToSend = parts[0].trim();
       shouldSend = true;
+    } else if (words.length >= minWordCount) {
+        shouldSend = true;
+        textToSend = newContent.trim();
     }
 
     if (shouldSend && textToSend.length > 0) {
       console.log("Sending to AI:", textToSend);
       socket.emit("sendToGoogleApi", { prompt: textToSend });
       sentenceToReplaceRef.current = textToSend;
-      lastSentContentRef.current = currentText;
-    } else if (newContent.length > 0 && debounceTimeoutRef.current === null) {
-      console.log("Sending accumulated text to AI (debounce):", newContent.trim());
-      socket.emit("sendToGoogleApi", { prompt: newContent.trim() });
-      sentenceToReplaceRef.current = newContent.trim();
       lastSentContentRef.current = currentText;
     }
   }, []);
@@ -273,6 +274,7 @@ export function SimpleEditor() {
         processAndSendContent(editor);
         debounceTimeoutRef.current = null;
       }, 700);
+      processAndSendContent(editor);
     },
   });
 

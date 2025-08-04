@@ -1,6 +1,7 @@
 "use client"
 import {
   Card,
+  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -9,10 +10,12 @@ import {
 } from "@/components/ui/card";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
+import { useRouter } from "next/navigation";
 
 const socket = io("http://localhost:3001");
 
 export default function Home() {
+  const router = useRouter()
   useEffect(() => {
     socket.on("connect", () => {
       console.log(socket.id);
@@ -44,6 +47,9 @@ export default function Home() {
             and production-ready deployments, featuring cutting-edge
             technologies and best practices.
           </CardDescription>
+          <CardAction onClick={() => router.push("/home")}>
+            Home
+          </CardAction>
         </CardHeader>
         <CardContent className="space-y-6 p-6 pt-0">
           <div className="space-y-2">
