@@ -203,7 +203,7 @@ export function SimpleEditor() {
     const words = newContent.trim().split(/\s+/);
     const minWordCount = 5;
     const isSentenceEnd = /[.?!]\s*$/.test(newContent);
-    const isParagraphBreak = /\n\n/.test(newContent);
+    const paragraphBreakRegex = /\n\n/; // Use a variable for the regex
 
     let shouldSend = false;
     let textToSend = newContent.trim();
@@ -211,8 +211,8 @@ export function SimpleEditor() {
     if (isSentenceEnd) {
       shouldSend = true;
       textToSend = newContent.trim();
-    } else if (isParagraphBreak) {
-      const parts = newContent.split(isParagraphBreak);
+    } else if (paragraphBreakRegex.test(newContent)) { // Check if the regex matches
+      const parts = newContent.split(paragraphBreakRegex); // Pass the regex to split()
       textToSend = parts[0].trim();
       shouldSend = true;
     } else if (words.length >= minWordCount) {
@@ -265,7 +265,33 @@ export function SimpleEditor() {
         onError: (error: Error) => console.error("Upload failed:", error),
       }),
     ],
-    content,
+    content: `
+      <h2>Hi there,</h2>
+      <p>
+        this is a <em>basic</em> example of a Tiptap editor with
+        <mark>highlighted</mark> text.
+      </p>
+      <p>
+        This editor uses the following extensions:
+        <ul>
+          <li>StarterKit</li>
+          <li>Link</li>
+          <li>TextAlign</li>
+          <li>TaskList</li>
+          <li>TaskItem</li>
+          <li>Highlight</li>
+          <li>Image</li>
+          <li>Typography</li>
+          <li>Superscript</li>
+          <li>Subscript</li>
+          <li>Selection</li>
+          <li>ImageUploadNode</li>
+        </ul>
+      </p>
+      <p>
+        Feel free to play around with it and explore the features!
+      </p>
+    `,
     onUpdate: ({ editor }) => {
       if (debounceTimeoutRef.current) {
         clearTimeout(debounceTimeoutRef.current);
